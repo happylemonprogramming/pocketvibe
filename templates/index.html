@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Pocket Vibe</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#121212"/>
+    <meta name="description" content="Share your vibe from your pocket"/>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="vapid-public-key" content="{{ vapid_public_key }}">
+    
+    <link rel="icon" href="{{url_for('static', filename='icons/pocketvibe.png')}}" type="image/png">
+    <link rel="apple-touch-icon" href="{{url_for('static', filename='icons/pocketvibe.png')}}" type="image/png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}"/>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='design.css') }}">
+</head>
+<body>
+    <div class="floating-particles" id="particles"></div>
+    
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">Pocket Vibe</h1>
+            <p class="tagline">Ideas to apps with AI</p>
+        </header>
+
+        <!-- <div class="generation-steps" id="generationSteps">
+            <div class="step" id="currentStep">
+                <div class="step-icon">🧠</div>
+                <div class="step-text">Analyzing your requirements...</div>
+            </div>
+        </div> -->
+
+        <div class="demo-apps" id="demoApps" style="display: none;">
+            <div class="app-card">
+                <div class="app-preview">
+                    <img id="app-icon" src="{{ url_for('static', filename='icons/pocketvibe.png') }}" alt="App Icon">
+                    <div class="icon-spinner"></div>
+                </div>
+                <div class="app-title-container">
+                    <div class="app-title" id="app-title" data-text="">Super Cool App</div>
+                    <button class="icon-button" id="editButton" title="Edit app name">
+                        <img src="{{ url_for('static', filename='buttons/edit.png') }}" alt="Edit" width="16" height="16">
+                    </button>
+                </div>
+                <div id="site-url" class="copyable-url" data-url=""></div>
+                <div class="generation-steps" id="generationSteps">
+                    <div class="step" id="currentStep">
+                        <div class="step-icon">🧠</div>
+                        <div class="step-text">Analyzing your requirements...</div>
+                    </div>
+                </div>
+                <input id="app-name" class="copyable-url" style="display: none;" placeholder="App Name"></input>
+                <div id="icon-url-container" class="icon-url-container" style="display: none;">
+                    <input id="icon-url" class="copyable-url" placeholder="Icon Prompt or URL">
+                    <button class="refresh-icon-btn" id="retry-icon" title="Update icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 4v6h-6M1 20v-6h6"/>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="icon-validation-message" class="text-danger" style="display: none;"></div>
+
+                <div class="app-tags">
+                    <div class="tag" id="viewButton">
+                        <span>View</span>
+                    </div>
+                    <div class="tag" id="shareButton">
+                        <span>Share</span>
+                    </div>
+                    <div class="tag" id="retryButton">
+                        <span>Retry</span>
+                    </div>
+                    <div class="tag" id="donateButton">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 6px;">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Donate</span>
+                    </div>
+                    <div id="discardButton" class="tag" style="display: none;">
+                        <span>Discard</span>
+                    </div>
+                    <div id="acceptButton" class="tag" style="display: none;">
+                        <span>Accept</span>
+                    </div>
+                </div>
+                <div id="site-id" style="display: none;" aria-hidden="true"></div>
+            </div>
+        </div>
+
+        <div id="mainInterface" class="main-interface">
+            <div class="prompt-section">
+                <label class="prompt-label">Describe the vibe:</label>
+                <textarea 
+                    class="prompt-input" 
+                    placeholder="I want to build a task management app that helps teams collaborate in real-time, with AI-powered priority suggestions and automated progress tracking..."
+                    id="promptInput"
+                ></textarea>
+            </div>
+
+            <button class="generate-btn" id="generateBtn">
+                <span id="btnText">Create App</span>
+                <div class="loading-overlay"></div>
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Donate</span>
+                <div class="modal-controls">
+                    <label class="switch">
+                        <input type="checkbox" id="paymentToggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="modal-close">&times;</span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div id="stripePayment" class="payment-option">
+                    <stripe-buy-button
+                        buy-button-id="buy_btn_1RR59bGjpNqUmv6Rry01H9GS"
+                        publishable-key="pk_live_51PF9bxGjpNqUmv6Ra8aL6oKO9I8odnc6PUjf7gGIsd4DuFKAOxkdx8dKnsszXo7ZdbRLsiJFaqlRrRz6nnM4hB9G00GVEoO9P5"
+                    >
+                    </stripe-buy-button>
+                </div>
+                <div id="btcPayment" class="payment-option" style="display: none;">
+                    <form id="btcDonationForm" class="donation-form">
+                        <div class="qr-container">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=lightning:lemonlemons@strike.me&color=FFFFFF&bgcolor=16213E" 
+                                alt="Strike.me QR Code" 
+                                class="qr-code">
+                            <div class="qr-spinner-overlay"></div>
+                            <div class="qr-address">lemonlemons@strike.me</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="donationAmount">Amount (sats)</label>
+                            <input type="number" id="donationAmount" name="amount" min="1" placeholder="5000" required>
+                        </div>
+                        <button type="submit" class="donate-button">Donate</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='design.js') }}"></script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <script src="{{ url_for('static', filename='actions.js') }}"></script>
+    <script src="{{ url_for('static', filename='donate.js') }}"></script>
+    <script src="{{ url_for('static', filename='generate.js') }}"></script>
+    <script src="{{ url_for('static', filename='customize.js') }}"></script>
+    <script src="{{ url_for('static', filename='notifications.js') }}"></script>
+    <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+
+</body>
+</html>

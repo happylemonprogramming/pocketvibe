@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=production
+      - FLASK_APP=app.py
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./logs:/app/logs
+      - ./sites.db:/app/sites.db
+    # Uncomment for HTTPS with Let's Encrypt
+    # environment:
+    #   - VIRTUAL_HOST=yourdomain.com
+    #   - LETSENCRYPT_HOST=yourdomain.com
+    #   - LETSENCRYPT_EMAIL=your-email@example.com
+
+# Uncomment to use with nginx-proxy for multiple sites
+# networks:
+#   default:
+#     external:
+#       name: nginx-proxy 

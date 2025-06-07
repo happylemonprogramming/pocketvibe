@@ -1,0 +1,6 @@
+__pycache__/
+pocket/
+test/
+old/
+/migrations
+/nostr
