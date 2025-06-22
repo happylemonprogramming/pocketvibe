@@ -70,38 +70,25 @@ def call_ai_service(prompt):
         logger.info("[AI Request] Sending request to AI API")
         api_start_time = time.time()
         
-        # Prepare the prompt with instructions
-        full_prompt = f"""
-I need you to act as an LEGENDARY webapp builder. 
-Friends are coming to you for your expertise and knowledge.
-You are generous with your gifts, helping all who need you.
-You only need reply with complete web code to help your friend's dreams come true. 
-You need not explain yourself as you are the foremost expert on code.
-You simply reply with code. Nothing else. Efficiently helping your friends.
-Here are some basic requests from your friends:
-- Create a complete, valid HTML document with embedded CSS and JavaScript based on the provided description
-- Prioritize CSS-based visuals for design
-- Use CSS gradients, shapes, and patterns for visual interest
-- Create abstract geometric backgrounds and card layouts with CSS, where appropriate
-- Build hero sections and visual hierarchy using CSS styling
-- Only use photos when specifically needed for content (portfolio, gallery, product images)
-- For icons and simple graphics, use your advanced, embedded base64 SVG data skills or Unicode symbols
-- Follow mobile-first responsive design with proper breakpoints
-- Design for mobile (320px+) first (avoiding horizontal scrolling)
-- Add tablet styles using @media (min-width: 768px)
-- Add desktop styles using @media (min-width: 1024px)
-- Use relative units (rem, em, %, vw, vh) and fluid layouts
-- Ensure content scales smoothly between breakpoints
-- Use modern CSS features (flexbox, grid, custom properties) with cross-browser compatibility
-- Make layouts flexible and adaptive across all screen sizes while prioritizing mobile experience
-You know all of this and more.
-Providing HTML, CSS, and JS code only helps your friends deploy faster, build more and get excited!
-You are helping the world grow into a beautiful, positive place with each friend you help.
-So many people only have mobile devices and you are helping them build without knowing any code.
+        # Read the prompt template from the text file
+        try:
+            with open('site_prompt.txt', 'r', encoding='utf-8') as f:
+                prompt_template = f.read()
+        except FileNotFoundError:
+            logger.warning("[AI Request] site_prompt.txt not found, using fallback prompt")
+            prompt_template = """You are a LEGENDARY webapp builder. 
+Reply with complete web code only. 
+Do not explain yourself, respond with code only.
+Create a complete, valid using only HTML, CSS and Javascript.
+Only use photos when specifically needed for content (portfolio, gallery, product images).
+For icons and simple graphics, use embedded base64 SVG or Unicode symbols.
+Build mobile-first with relative units to work on all screen sizes.
 
-Here is the idea your friend needs you to make a reality: 
-{prompt}
-"""
+Here is the webapp description: 
+{prompt}"""
+        
+        # Prepare the full prompt by replacing the placeholder
+        full_prompt = prompt_template.format(prompt=prompt)
         
         # Generate content using the provider
         result = provider.generate_content(full_prompt)

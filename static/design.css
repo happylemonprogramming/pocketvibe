@@ -27,7 +27,7 @@ body {
 }
 
 .logo {
-    font-size: 2.0rem;
+    font-size: 2.5rem;
     font-weight: 800;
     background: linear-gradient(45deg, #00d4ff, #9c27b0, #ff6b35);
     background-size: 300% 300%;
@@ -531,9 +531,9 @@ body {
         grid-template-columns: 1fr;
     }
     
-    .logo {
-        font-size: 2rem;
-    }
+    /* .logo {
+        font-size: 1.8rem;
+    } */
 }
 
 /* ==========================================================================
@@ -913,4 +913,377 @@ input:checked + .slider:before {
     background: rgba(255, 107, 53, 0.1);
     border: 1px solid rgba(255, 107, 53, 0.2);
     display: none;
+}
+
+.install-app-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    text-align: center;
+    display: none; /* Hidden by default */
+}
+
+.install-app-container.show {
+    display: block;
+}
+
+.install-app-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+}
+
+.install-app-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.install-app-btn:active {
+    transform: translateY(0);
+}
+
+/* Install Modal Styles */
+.install-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.install-modal.show {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+}
+
+.install-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+.install-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* margin-bottom: 25px; */
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.install-modal-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    background: linear-gradient(45deg, #00d4ff, #9c27b0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: 'Press Start 2P', cursive;
+}
+
+.close-modal {
+    color: #a0a0a0;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    position: relative;
+}
+
+.close-modal:hover {
+    color: #ff4444;
+    background: rgba(255, 68, 68, 0.1);
+    transform: rotate(180deg);
+}
+
+.close-modal:active {
+    transform: rotate(360deg);
+    background: rgba(255, 68, 68, 0.2);
+}
+
+.install-modal-body {
+    padding: 20px;
+    color: white;
+}
+
+/* .install-instructions {
+    margin-top: 20px;
+} */
+
+.install-instructions h3 {
+    color: white;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.install-instructions ol {
+    margin: 0;
+    /* padding-left: 20px; */
+}
+
+.install-instructions li {
+    margin-bottom: 15px;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+}
+
+.instruction-icon {
+    width: 24px;
+    margin-left: 8px;
+    vertical-align: middle;
+    filter: brightness(0) invert(1);
+    height: 24px;
+    margin-right: 10px;
+}
+
+/* Completed Sites Modal Styles */
+.completed-sites-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.completed-sites-modal .modal-content {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+.completed-sites-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.completed-sites-modal h3 {
+    color: #e0e0e0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.completed-sites-modal .modal-close {
+    background: none;
+    border: none;
+    color: #a0a0a0;
+    font-size: 1.5rem;
+    font-weight: 300;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.completed-sites-modal .modal-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+}
+
+.sites-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.site-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.site-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(0, 212, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.site-info {
+    flex: 1;
+}
+
+.site-info strong {
+    display: block;
+    color: #e0e0e0;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.site-info small {
+    color: #a0a0a0;
+    font-size: 0.9rem;
+}
+
+.site-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.view-site-btn {
+    background: linear-gradient(45deg, #00d4ff, #9c27b0);
+    border: none;
+    border-radius: 12px;
+    padding: 10px 20px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.view-site-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+}
+
+.delete-site-btn {
+    background: rgba(255, 59, 48, 0.1);
+    border: 1px solid rgba(255, 59, 48, 0.3);
+    border-radius: 8px;
+    padding: 8px;
+    color: #ff3b30;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-site-btn:hover {
+    background: rgba(255, 59, 48, 0.2);
+    border-color: rgba(255, 59, 48, 0.5);
+    transform: translateY(-1px);
+}
+
+.completed-sites-modal .close-modal {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 15px;
+    color: #e0e0e0;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.completed-sites-modal .close-modal:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 768px) {
+    .completed-sites-modal .modal-content {
+        padding: 20px;
+        margin: 20px;
+    }
+    
+    .site-item {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .site-actions {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .view-site-btn {
+        flex: 1;
+        max-width: 120px;
+    }
+}
+
+.view-apps-btn {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e0e0e0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.view-apps-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.view-apps-btn:active {
+    transform: translateY(0);
 }

@@ -130,3 +130,96 @@ setInterval(() => {
         placeholderIndex = (placeholderIndex + 1) % samplePrompts.length;
     }
 }, 4000);
+
+// Install App Modal Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    checkPWAInstallation();
+
+    const installBtn = document.getElementById('installAppBtn');
+    const modal = document.getElementById('installModal');
+    const closeBtn = modal.querySelector('.close-modal');
+    const iosInstructions = document.getElementById('iosInstructions');
+    const androidInstructions = document.getElementById('androidInstructions');
+    const desktopInstructions = document.getElementById('desktopInstructions');
+
+    // Detect platform
+    function detectPlatform() {
+        const userAgent = navigator.userAgent.toLowerCase();
+        if (/iphone|ipad|ipod/.test(userAgent)) {
+            return 'ios';
+        } else if (/android/.test(userAgent)) {
+            return 'android';
+        } else {
+            return 'desktop';
+        }
+    }
+
+    // Show platform-specific instructions
+    function showPlatformInstructions() {
+        const platform = detectPlatform();
+        console.log('Detected platform:', platform);
+        
+        iosInstructions.style.display = 'none';
+        androidInstructions.style.display = 'none';
+        desktopInstructions.style.display = 'none';
+
+        switch(platform) {
+            case 'ios':
+                iosInstructions.style.display = 'block';
+                break;
+            case 'android':
+                androidInstructions.style.display = 'block';
+                break;
+            default:
+                desktopInstructions.style.display = 'block';
+        }
+    }
+
+    // Open modal
+    installBtn.addEventListener('click', function() {
+        showPlatformInstructions();
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    });
+
+    // Close modal
+    closeBtn.addEventListener('click', function() {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && modal.classList.contains('show')) {
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+    });
+
+    // Debug log to confirm initialization
+    console.log('Install app modal initialized');
+});
+
+// Check if app is installed as PWA
+function checkPWAInstallation() {
+    const installContainer = document.querySelector('.install-app-container');
+    if (!installContainer) return;
+
+    // Check if running in standalone mode (installed as PWA)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                        window.navigator.standalone || 
+                        document.referrer.includes('android-app://');
+
+    // Show install button only if NOT installed as PWA
+    if (!isStandalone) {
+        installContainer.classList.add('show');
+    }
+}

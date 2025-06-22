@@ -20,7 +20,7 @@ def serverlink(local_filepath, object_name='icon.png'):
 
     # Uploads the given file using a managed uploader, which will split up large
     # files automatically and upload parts in parallel.
-    s3.upload_file(filename, bucket_name, object_name, ExtraArgs={'ContentType': "image/png", 'CacheControl': "max-age=31536000"})
+    s3.upload_file(filename, bucket_name, object_name, ExtraArgs={'ContentType': "video/mp4", 'CacheControl': "max-age=31536000"})
     try:
         response = s3.head_object(Bucket=bucket_name, Key=object_name)
         print(f"S3 file size: {response['ContentLength']} bytes")
@@ -54,7 +54,7 @@ def serverlink(local_filepath, object_name='icon.png'):
     return url
 
 if __name__ == "__main__":
-    path = r'C:\Users\clayt\Documents\Programming\pocketVibe\static\icons\pocketvibe.png'
-    name = 'pocketvibe.png'
-    image = serverlink(path,name)
-    print(image)
+    path = r"C:\Users\clayt\Videos\Pocket Vibe Demo Latest.mp4"
+    name = 'pocketvibedemo.mp4'
+    file = serverlink(path,name)
+    print(file)

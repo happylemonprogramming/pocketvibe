@@ -493,6 +493,22 @@ def update_app_icon():
         html_content = site.content
         logger.info("Successfully retrieved HTML content")
 
+        # Check if html_content is None or empty
+        if not html_content:
+            logger.error(f"Site content is empty or None for site_id: {site_id}")
+            
+            # Check if the site is still being generated
+            if site.status == 'processing':
+                return jsonify({
+                    "status": "error", 
+                    "message": "Site is still being generated. Please wait 1-2 minutes and try again."
+                }), 400
+            else:
+                return jsonify({
+                    "status": "error", 
+                    "message": "Site content is not available. The site may have been deleted or corrupted."
+                }), 400
+
         # Update icon paths in HTML
         logger.info("Updating HTML content with new paths")
         

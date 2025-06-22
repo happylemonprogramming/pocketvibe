@@ -276,14 +276,45 @@ async function initializeAndDebug() {
 
 // Check if web push is supported
 function isPushNotificationSupported() {
+    // Check if it's iOS Safari
+    const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && 
+                       !window.MSStream && 
+                       /Safari/.test(navigator.userAgent) && 
+                       !/Chrome/.test(navigator.userAgent);
+
+    // For iOS Safari, check if running in standalone mode (PWA)
+    if (isIOSSafari) {
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                           window.navigator.standalone === true;
+        
+        console.log('iOS Safari PWA status:', {
+            isStandalone,
+            displayMode: window.matchMedia('(display-mode: standalone)').matches,
+            navigatorStandalone: window.navigator.standalone
+        });
+        
+        if (!isStandalone) {
+            console.log('Push notifications only available when installed as PWA on iOS Safari');
+            return false;
+        }
+    }
+
     const supported = 'serviceWorker' in navigator && 
                      'PushManager' in window &&
                      'Notification' in window;
+    
     console.log('Push support:', {
         serviceWorker: 'serviceWorker' in navigator,
         pushManager: 'PushManager' in window,
-        notification: 'Notification' in window
+        notification: 'Notification' in window,
+        browser: {
+            isIOSSafari,
+            isStandalone: window.matchMedia('(display-mode: standalone)').matches || 
+                         window.navigator.standalone === true,
+            userAgent: navigator.userAgent
+        }
     });
+    
     return supported;
 }
 
@@ -338,17 +369,12 @@ function showNotification(title, body, options = {}) {
 
 // Request permission and subscribe in one user gesture
 async function requestNotificationPermissionAndSubscribe() {
-    if (!isPushNotificationSupported()) {
-        console.error('Push notifications not supported');
-        return false;
-    }
-
     try {
         // Request permission
         const permission = await Notification.requestPermission();
         if (permission !== 'granted') {
             console.log('Notification permission denied');
-            return false;
+            return;
         }
 
         // Get service worker ready
@@ -370,7 +396,7 @@ async function requestNotificationPermissionAndSubscribe() {
         const vapidPublicKey = window.VAPID_PUBLIC_KEY;
         if (!vapidPublicKey) {
             console.error('VAPID key not found');
-            return false;
+            return;
         }
 
         // Create subscription

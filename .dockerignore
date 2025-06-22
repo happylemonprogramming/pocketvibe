@@ -1,4 +1,8 @@
+__pycache__/
+pocket/
 test/
 old/
 /migrations
 /nostr
+prompts.json
+prompts.txt

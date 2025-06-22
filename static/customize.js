@@ -218,8 +218,26 @@ acceptButton.addEventListener('click', async (e) => {
             siteUrl.setAttribute('data-url', newUrl);  // Store the URL in a data attribute
 
         } else {
-            alert('Error updating app icon');
-        }
+            alert('Something went wrong, please try again');
+            // Remove editable fields
+            discardButton.style.display = 'none';
+            acceptButton.style.display = 'none';
+            appNameInput.style.display = 'none';
+            document.querySelector('.icon-url-container').style.display = 'none';
+            validationMessage.style.display = 'none';
+
+            // Show original fields
+            if (siteUrl.getAttribute('data-url').includes('pocket-vibe.koyeb.app')) {
+                siteUrl.style.display = '';
+            }
+
+            editButton.style.display = '';
+            shareButton.style.display = '';
+            retryButton.style.display = '';
+            donateButton.style.display = '';
+            viewButton.style.display = '';
+            // appTitle.style.display = '';
+            }
     }
 
     // Remove editable fields
