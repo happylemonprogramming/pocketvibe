@@ -43,4 +43,4 @@ class AIProviderFactory:
     @classmethod
     def get_available_providers(cls) -> list[str]:
         """Get list of available provider names"""
-        return ["openai", "anthropic", "stability"] 
+        return ["openai", "anthropic", "openrouter", "stability"] 

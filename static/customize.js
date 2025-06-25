@@ -163,6 +163,13 @@ discardButton.addEventListener('click', () => {
   donateButton.style.display = '';
   viewButton.style.display = '';
 //   appTitle.style.display = '';
+
+  // Clear the flags since user discarded changes
+  const demoApps = document.getElementById('demoApps');
+  if (demoApps) {
+    demoApps.removeAttribute('data-loaded-from-list');
+    demoApps.removeAttribute('data-original-site-id');
+  }
 });
 
 acceptButton = document.getElementById('acceptButton');
@@ -216,6 +223,20 @@ acceptButton.addEventListener('click', async (e) => {
             // Update the site URL
             siteUrl.textContent = newUrl;
             siteUrl.setAttribute('data-url', newUrl);  // Store the URL in a data attribute
+
+            // Update stored site data if this site was loaded from the completed sites list
+            if (typeof updateStoredSiteData === 'function') {
+                try {
+                    const updated = updateStoredSiteData(result.app_url, newUrl, appName, previewImage.src);
+                    if (updated) {
+                        console.log('Successfully updated stored site data');
+                    }
+                } catch (error) {
+                    console.warn('Failed to update stored site data:', error);
+                }
+            } else {
+                console.log('updateStoredSiteData function not available');
+            }
 
         } else {
             alert('Something went wrong, please try again');

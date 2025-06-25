@@ -14,6 +14,9 @@ def get_provider(provider_name: str):
     elif provider_name.lower() == "anthropic":
         from .providers.anthropic_provider import AnthropicProvider
         return AnthropicProvider
+    elif provider_name.lower() == "openrouter":
+        from .providers.openrouter_provider import OpenRouterProvider
+        return OpenRouterProvider
     elif provider_name.lower() == "stability":
         from .providers.stability_provider import StabilityAIProvider
         return StabilityAIProvider

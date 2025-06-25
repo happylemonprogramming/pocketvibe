@@ -315,7 +315,8 @@ async function handlePollingSuccess(siteId) {
                         
                         // Store the completed site for persistence
                         const appName = appTitle.getAttribute('data-text') || 'Generated App';
-                        storeCompletedSite(siteId, newUrl, appName);
+                        const iconSrc = appIcon ? appIcon.src : '/static/icons/pocketvibe.png';
+                        storeCompletedSite(siteId, newUrl, appName, iconSrc);
                         
                         // Stop the generation animation
                         if (typeof stopGenerationAnimation === 'function') {
@@ -409,7 +410,8 @@ async function handlePollingSuccess(siteId) {
         
         // Store the completed site for persistence
         const appName = document.getElementById('app-title')?.getAttribute('data-text') || 'Generated App';
-        storeCompletedSite(siteId, siteUrl, appName);
+        const iconSrc = appIcon ? appIcon.src : '/static/icons/pocketvibe.png';
+        storeCompletedSite(siteId, siteUrl, appName, iconSrc);
         
         // // Show the demo apps section
         // if (demoApps) {
@@ -605,12 +607,13 @@ generateBtn.addEventListener('click', async (e) => {
 });
 
 // Store completed site information
-function storeCompletedSite(siteId, siteUrl, appName = '') {
+function storeCompletedSite(siteId, siteUrl, appName = '', iconSrc = '') {
     const completedSites = JSON.parse(localStorage.getItem('completedSites') || '[]');
     const siteInfo = {
         siteId: siteId,
         siteUrl: siteUrl,
         appName: appName,
+        iconSrc: iconSrc || '/static/icons/pocketvibe.png', // Default to default icon if none provided
         completedAt: Date.now()
     };
     
@@ -618,8 +621,8 @@ function storeCompletedSite(siteId, siteUrl, appName = '') {
     const filteredSites = completedSites.filter(site => site.siteId !== siteId);
     filteredSites.unshift(siteInfo); // Add to beginning
     
-    // Keep only the last 10 completed sites
-    const trimmedSites = filteredSites.slice(0, 10);
+    // Keep only the last 100 completed sites
+    const trimmedSites = filteredSites.slice(0, 100);
     localStorage.setItem('completedSites', JSON.stringify(trimmedSites));
     
     // Update the "View My Apps" button visibility
@@ -665,19 +668,30 @@ function showCompletedSitesList(completedSites) {
     container.innerHTML = `
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Your Generated Apps</h3>
+                <h3>Generated Apps</h3>
                 <button class="modal-close" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
             </div>
             <div class="sites-list">
                 ${completedSites.map(site => `
-                    <div class="site-item" data-site-id="${site.siteId}" data-site-url="${site.siteUrl}">
+                    <div class="site-item" 
+                         data-site-id="${site.siteId}" 
+                         data-site-url="${site.siteUrl}" 
+                         data-app-name="${site.appName || 'Super Cool App'}"
+                         data-icon-src="${site.iconSrc || '/static/icons/pocketvibe.png'}"
+                         onclick="loadSiteFromDataAttributes(this)">
+                        <div class="site-preview">
+                            <img src="${site.iconSrc || '/static/icons/pocketvibe.png'}" 
+                                 alt="${site.appName || 'Super Cool App'}" 
+                                 class="site-icon-preview"
+                                 onerror="this.src='/static/icons/pocketvibe.png'">
+                        </div>
                         <div class="site-info">
-                            <strong>${site.appName || 'Generated App'}</strong>
+                            <strong>${site.appName || 'Super Cool App'}</strong>
                             <small>${new Date(site.completedAt).toLocaleDateString()}</small>
                         </div>
                         <div class="site-actions">
-                            <button class="view-site-btn" onclick="openSite('${site.siteUrl}')">View</button>
-                            <button class="delete-site-btn" onclick="removeCompletedSite('${site.siteId}'); this.parentElement.parentElement.remove();" title="Delete">
+                            <button class="view-site-btn" onclick="event.stopPropagation(); openSite('${site.siteUrl}')">View</button>
+                            <button class="delete-site-btn" onclick="event.stopPropagation(); removeCompletedSite('${site.siteId}'); this.parentElement.parentElement.remove();" title="Delete">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="3,6 5,6 21,6"></polyline>
                                     <path d="M19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
@@ -691,6 +705,126 @@ function showCompletedSitesList(completedSites) {
     `;
     
     document.body.appendChild(container);
+}
+
+// Helper function to load site from data attributes
+function loadSiteFromDataAttributes(element) {
+    const siteId = element.getAttribute('data-site-id');
+    const siteUrl = element.getAttribute('data-site-url');
+    const appName = element.getAttribute('data-app-name');
+    const iconSrc = element.getAttribute('data-icon-src');
+    
+    loadSiteIntoDemoApps(siteId, siteUrl, appName, iconSrc);
+}
+
+// Function to load a site into the demo apps container
+function loadSiteIntoDemoApps(siteId, siteUrl, appName, iconSrc = '/static/icons/pocketvibe.png') {
+    console.log('Loading site into demo apps:', { siteId, siteUrl, appName, iconSrc });
+    
+    // Close the modal
+    const modal = document.querySelector('.completed-sites-modal');
+    if (modal) {
+        modal.remove();
+    }
+    
+    // Get the demo apps container
+    const demoApps = document.getElementById('demoApps');
+    const mainInterface = document.getElementById('mainInterface');
+    
+    if (!demoApps) {
+        console.error('Demo apps container not found');
+        return;
+    }
+    
+    // Hide the main interface and show demo apps
+    if (mainInterface) {
+        mainInterface.style.display = 'none';
+    }
+    demoApps.style.display = 'grid';
+    
+    // Populate the demo apps container with site information
+    const appTitle = document.getElementById('app-title');
+    const siteUrlElement = document.getElementById('site-url');
+    const siteIdElement = document.getElementById('site-id');
+    const appIcon = document.getElementById('app-icon');
+    
+    // Set the app title
+    if (appTitle) {
+        appTitle.textContent = appName;
+        appTitle.setAttribute('data-text', appName);
+    }
+    
+    // Set the site URL
+    if (siteUrlElement) {
+        siteUrlElement.textContent = siteUrl;
+        siteUrlElement.setAttribute('data-url', siteUrl);
+        siteUrlElement.style.display = 'block'; // Make sure it's visible
+    }
+    
+    // Set the site ID
+    if (siteIdElement) {
+        siteIdElement.textContent = siteId;
+    }
+    
+    // Set the app icon to the stored icon source
+    if (appIcon) {
+        appIcon.src = iconSrc;
+        
+        // Add error handling for icon loading
+        appIcon.onerror = () => {
+            console.warn('Failed to load stored icon, falling back to default:', iconSrc);
+            appIcon.src = '/static/icons/pocketvibe.png';
+        };
+    }
+    
+    // Hide the generation steps since this is an existing site
+    const generationSteps = document.getElementById('generationSteps');
+    if (generationSteps) {
+        generationSteps.style.display = 'none';
+    }
+    
+    // Show the edit buttons for customization
+    const editButton = document.getElementById('editButton');
+    if (editButton) {
+        editButton.style.display = 'block';
+    }
+    
+    // Make sure all action buttons are visible
+    const viewButton = document.getElementById('viewButton');
+    const shareButton = document.getElementById('shareButton');
+    const retryButton = document.getElementById('retryButton');
+    const donateButton = document.getElementById('donateButton');
+    
+    if (viewButton) viewButton.style.display = '';
+    if (shareButton) shareButton.style.display = '';
+    if (retryButton) retryButton.style.display = '';
+    if (donateButton) donateButton.style.display = '';
+    
+    // Hide edit-related elements initially
+    const discardButton = document.getElementById('discardButton');
+    const acceptButton = document.getElementById('acceptButton');
+    const iconUrlContainer = document.querySelector('.icon-url-container');
+    const appNameInput = document.getElementById('app-name');
+    const validationMessage = document.getElementById('icon-validation-message');
+    
+    if (discardButton) discardButton.style.display = 'none';
+    if (acceptButton) acceptButton.style.display = 'none';
+    if (iconUrlContainer) iconUrlContainer.style.display = 'none';
+    if (appNameInput) appNameInput.style.display = 'none';
+    if (validationMessage) validationMessage.style.display = 'none';
+    
+    // Set a flag to indicate this site was loaded from completed sites list
+    // This will be used to update the stored data when changes are accepted
+    demoApps.setAttribute('data-loaded-from-list', 'true');
+    demoApps.setAttribute('data-original-site-id', siteId);
+    
+    // Scroll to the demo apps section
+    demoApps.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+    });
+    
+    console.log('Site loaded into demo apps successfully');
 }
 
 // Function to open a site
@@ -714,4 +848,59 @@ function removeCompletedSite(siteId) {
             modal.remove();
         }
     }
+}
+
+// Function to update stored site data when changes are accepted
+function updateStoredSiteData(newSiteId, newSiteUrl, newAppName, newIconSrc) {
+    const completedSites = JSON.parse(localStorage.getItem('completedSites') || '[]');
+    const demoApps = document.getElementById('demoApps');
+    
+    // Check if this site was loaded from the completed sites list
+    const loadedFromList = demoApps.getAttribute('data-loaded-from-list') === 'true';
+    const originalSiteId = demoApps.getAttribute('data-original-site-id');
+    
+    if (loadedFromList && originalSiteId) {
+        console.log('Updating stored site data for site loaded from list:', {
+            originalSiteId,
+            newSiteId,
+            newSiteUrl,
+            newAppName,
+            newIconSrc
+        });
+        
+        // Find and update the original site entry
+        const siteIndex = completedSites.findIndex(site => site.siteId === originalSiteId);
+        
+        if (siteIndex !== -1) {
+            // Update the existing entry with new data
+            completedSites[siteIndex] = {
+                siteId: newSiteId,
+                siteUrl: newSiteUrl,
+                appName: newAppName,
+                iconSrc: newIconSrc,
+                completedAt: Date.now() // Update timestamp to move to top
+            };
+            
+            // Move the updated site to the top of the list
+            const updatedSite = completedSites.splice(siteIndex, 1)[0];
+            completedSites.unshift(updatedSite);
+            
+            // Save the updated list
+            localStorage.setItem('completedSites', JSON.stringify(completedSites));
+            
+            console.log('Successfully updated stored site data');
+            
+            // Clear the flags since we've updated the data
+            demoApps.removeAttribute('data-loaded-from-list');
+            demoApps.removeAttribute('data-original-site-id');
+            
+            return true;
+        } else {
+            console.warn('Original site not found in stored data:', originalSiteId);
+        }
+    } else {
+        console.log('Site not loaded from list or no original site ID, skipping stored data update');
+    }
+    
+    return false;
 }

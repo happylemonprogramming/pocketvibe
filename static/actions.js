@@ -108,6 +108,12 @@ retryButton.addEventListener('click', () => {
     siteUrl.style.display = 'none';
     siteUrl.textContent = '';
     siteUrl.setAttribute('data-url', '');
+
+    // Clear any flags from loaded sites
+    if (demoApps) {
+        demoApps.removeAttribute('data-loaded-from-list');
+        demoApps.removeAttribute('data-original-site-id');
+    }
 });
 
 siteUrl = document.getElementById('site-url');

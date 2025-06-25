@@ -63,7 +63,7 @@ def call_ai_service(prompt):
     
     try:
         # Get the configured provider
-        provider_name = os.getenv("AI_PROVIDER", "openai")
+        provider_name = os.getenv("AI_PROVIDER", "openrouter")
         provider = AIProviderFactory.get_provider(provider_name)
         
         logger.info(f"[AI Request] Using provider: {provider_name}")

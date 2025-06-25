@@ -4,10 +4,10 @@ import dramatiq
 import logging
 from worker_setup import broker  # ensure this initializes Dramatiq
 from helpers import call_ai_service, inject_pwa_support  # your custom functions
-from openai import OpenAI 
 from helpers import strip_code_block  # your util to clean response
 from db import get_db, Site, CSSGeneration, PushSubscription
 from pywebpush import webpush, WebPushException
+from ai.factory import AIProviderFactory
 import json
 
 logger = logging.getLogger(__name__)
@@ -175,16 +175,13 @@ def generate_site_task(site_id, prompt):
 def generate_css_task(css_id, prompt, css_content):
     logger.info(f"[Task] Starting CSS generation for css_id: {css_id}")
     try:
-        api_key = os.getenv("chatgptapikey")
-        if not api_key:
-            raise ValueError("OpenAI API key not found")
-
-        logger.info("[Task] Calling OpenAI API")
-        client = OpenAI(api_key=api_key)
-
-        response = client.responses.create(
-            model="gpt-4.1",
-            input=f"""
+        # Get the configured provider (default to OpenRouter)
+        provider_name = os.getenv("AI_PROVIDER", "openrouter")
+        provider = AIProviderFactory.get_provider(provider_name)
+        
+        logger.info(f"[Task] Using AI provider: {provider_name}")
+        
+        css_prompt = f"""
 I need you to act as an LEGENDARY webapp desiner. 
 There is code someone wrote that needs to be elevated.
 Friends are coming to you for your expertise and knowledge.
@@ -205,10 +202,10 @@ Of course, you enjoy helping your friends build and want to make the best versio
 Here is the idea your friend needs you to make a reality: {prompt}
 And here is the code that needs to be modified: {css_content}
 """
-        )
 
-        logger.info("[Task] Processing OpenAI response")
-        new_css = strip_code_block(response.output[0].content[0].text)
+        logger.info("[Task] Calling AI service for CSS generation")
+        new_css = provider.generate_content(css_prompt)
+        new_css = strip_code_block(new_css)
 
         logger.info("[Task] Saving to database")
         with get_db() as db:
